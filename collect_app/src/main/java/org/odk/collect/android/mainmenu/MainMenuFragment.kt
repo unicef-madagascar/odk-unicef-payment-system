@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import org.odk.collect.android.activities.DeleteFormsActivity
 import org.odk.collect.android.activities.FormDownloadListActivity
 import org.odk.collect.android.activities.InstanceChooserList
+import org.odk.collect.android.activities.SummariseFormsActivity
 import org.odk.collect.android.application.MapboxClassInstanceCreator
 import org.odk.collect.android.databinding.MainMenuBinding
 import org.odk.collect.android.formentry.FormOpeningMode
@@ -130,10 +131,10 @@ class MainMenuFragment(
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         val projectsMenuItem = menu.findItem(org.odk.collect.android.R.id.projects)
-        (projectsMenuItem.actionView as ProjectIconView).apply {
-            project = currentProjectViewModel.currentProject.value
-            setOnClickListener { onOptionsItemSelected(projectsMenuItem) }
-            contentDescription = getString(string.projects)
+        val projectLogoView = layoutInflater.inflate(org.odk.collect.android.R.layout.project_logo_view, null)
+        projectsMenuItem.actionView = projectLogoView
+        projectLogoView.setOnClickListener {
+            onOptionsItemSelected(projectsMenuItem)
         }
     }
 
@@ -220,6 +221,10 @@ class MainMenuFragment(
 
         binding.manageForms.setOnClickListener {
             startActivity(Intent(requireContext(), DeleteFormsActivity::class.java))
+        }
+
+        binding.summariseForms.setOnClickListener {
+            startActivity(Intent(requireContext(), SummariseFormsActivity::class.java))
         }
 
         mainMenuViewModel.sendableInstancesCount.observe(viewLifecycleOwner) { finalized: Int ->

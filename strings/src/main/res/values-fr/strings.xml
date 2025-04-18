@@ -12,6 +12,8 @@
   <string name="get_forms">Télécharger formulaire</string>
   <!--Text for an action button on the main screen.-->
   <string name="manage_files">Supprimer des formulaires</string>
+  <!-- Text for an action button on the main screen. -->
+  <string name="summarise_forms">Résumé</string>
   <string name="saved_forms">Formulaires enregistrés</string>
   <string name="version_number">Version: %s</string>
   <string name="id_number">ID: %s</string>
@@ -621,6 +623,28 @@
   <string name="delete_yes">Supprimer ces formulaires</string>
   <string name="form_delete_message">Supprimer les formulaires sélectionnés</string>
   <string name="file_deleted_ok">%s formulaire(s) supprimé(s) avec succès.</string>
+
+  <!--
+  ##############################################
+  # SUMMARISE FORMS
+  ##############################################
+  -->
+  <string name="data_summary">Résumé des données</string>
+  <string name="summary_total_amount">Montant total</string>
+  <string name="summary_count_submissions">Nombre total de soumissions</string>
+  <string name="summary_count_households">Nombre total de ménages</string>
+  <string name="filter_by_form">Filtrer par formulaire</string>
+  <string name="filter_by_date">Filtrer par date</string>
+  <string name="download_data">Exporter les données</string>
+  <string name="share_data">Partager les données</string>
+  <string name="download_data_success">Fichier exporté dans le dossier Téléchargements</string>
+  <string name="share_data_in_progress">Partage du fichier en cours…</string>
+  <string name="no_data_for_date">Aucune donnée disponible pour cette date.</string>
+  <string name="empty_list_of_forms_date_filter_title">Aucune donnée disponible</string>
+  <string name="empty_list_of_forms_date_filter_subtitle">Aucun formulaire disponible pour cette date</string>
+  <string name="amount_ariary">%1$s Ariary</string>
+  <string name="hope_id_and_total">%1$s\n%2$s</string>
+
   <!--##############################################
     # UNPROTECTED SETTINGS
     ##############################################-->

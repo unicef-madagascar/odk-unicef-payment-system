@@ -11,6 +11,7 @@ import org.odk.collect.android.activities.FormDownloadListActivity;
 import org.odk.collect.android.activities.FormFillingActivity;
 import org.odk.collect.android.activities.FormMapActivity;
 import org.odk.collect.android.activities.InstanceChooserList;
+import org.odk.collect.android.activities.SummariseFormsActivity;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.application.initialization.ApplicationInitializer;
 import org.odk.collect.android.application.initialization.ExistingProjectMigrator;
@@ -216,6 +217,8 @@ public interface AppDependencyComponent {
     void inject(AudioRecordingErrorDialogFragment audioRecordingErrorDialogFragment);
 
     void inject(InstanceChooserList instanceChooserList);
+
+    void inject(SummariseFormsActivity SummariseFormsActivity);
 
     void inject(FormsProvider formsProvider);
 

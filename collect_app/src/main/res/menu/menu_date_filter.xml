@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_filter_form"
+        android:icon="@drawable/ic_form_state_saved"
+        android:title="@string/filter_by_form"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_filter_date"
+        android:icon="@drawable/baseline_calendar_month_24"
+        android:title="@string/filter_by_date"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_download_data"
+        android:icon="@drawable/ic_download_24"
+        android:title="@string/download_data"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_share_data"
+        android:icon="@drawable/ic_menu_share"
+        android:title="@string/share"
+        app:showAsAction="always" />
+</menu>

@@ -97,6 +97,16 @@
                 app:layout_constraintTop_toBottomOf="@id/get_forms"
                 app:name="@string/manage_files" />
 
+            <org.odk.collect.android.mainmenu.MainMenuButton
+                android:id="@+id/summarise_forms"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/baseline_bar_chart_24"
+                app:layout_constraintEnd_toEndOf="@id/enter_data"
+                app:layout_constraintStart_toStartOf="@id/enter_data"
+                app:layout_constraintTop_toBottomOf="@id/manage_forms"
+                app:name="@string/summarise_forms" />
+
             <TextView
                 android:id="@+id/app_name"
                 android:layout_width="wrap_content"
@@ -107,7 +117,7 @@
                 android:layout_marginTop="@dimen/margin_standard"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/manage_forms"
+                app:layout_constraintTop_toBottomOf="@id/summarise_forms"
                 tools:text="ODK Collect v2022.3" />
 
             <TextView

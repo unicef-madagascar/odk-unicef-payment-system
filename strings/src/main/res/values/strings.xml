@@ -22,6 +22,8 @@
     <string name="get_forms">Download form</string>
     <!-- Text for an action button on the main screen. -->
     <string name="manage_files">Delete form</string>
+    <!-- Text for an action button on the main screen. -->
+    <string name="summarise_forms">Summary</string>
 
     <string name="saved_forms">Saved forms</string>
 
@@ -773,6 +775,27 @@
     <string name="delete_yes">Delete Forms</string>
     <string name="form_delete_message">Deleting selected forms</string>
     <string name="file_deleted_ok">%s form(s) successfully deleted!</string>
+
+    <!--
+    ##############################################
+    # SUMMARISE FORMS
+    ##############################################
+    -->
+    <string name="data_summary">Data summary</string>
+    <string name="summary_total_amount">Total amount</string>
+    <string name="summary_count_submissions">Total submissions</string>
+    <string name="summary_count_households">Total households</string>
+    <string name="filter_by_form">Filter by form</string>
+    <string name="filter_by_date">Filter by date</string>
+    <string name="download_data">Download data</string>
+    <string name="share_data">Share data</string>
+    <string name="download_data_success">Data saved successfully in the Downloads folder</string>
+    <string name="share_data_in_progress">Data sharing in progress…</string>
+    <string name="no_data_for_date">No data available for selected date</string>
+    <string name="empty_list_of_forms_date_filter_title">No data available</string>
+    <string name="empty_list_of_forms_date_filter_subtitle">No forms are available for the selected date</string>
+    <string name="amount_ariary">%1$s Ariary</string>
+    <string name="hope_id_and_total">%1$s\n%2$s</string>
 
     <!--
     ##############################################

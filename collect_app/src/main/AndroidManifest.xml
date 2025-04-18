@@ -80,7 +80,7 @@ the specific language governing permissions and limitations under the License.
     <application
         android:name=".application.Collect"
         android:allowBackup="true"
-        android:icon="@drawable/notes"
+        android:icon="@drawable/logo"
         android:installLocation="auto"
         android:label="@string/collect_app_name"
         android:largeHeap="true"
@@ -129,6 +129,7 @@ the specific language governing permissions and limitations under the License.
             android:name="org.odk.collect.draw.DrawActivity"
             android:screenOrientation="landscape" />
         <activity android:name=".activities.InstanceChooserList" />
+        <activity android:name=".activities.SummariseFormsActivity" />
         <activity
             android:name=".formlists.blankformlist.BlankFormListActivity"
             android:launchMode="singleTop" />
