@@ -637,7 +637,10 @@
   <string name="filter_by_date">Filtrer par date</string>
   <string name="download_data">Exporter les données</string>
   <string name="share_data">Partager les données</string>
-  <string name="download_data_success">Fichier exporté dans le dossier Téléchargements</string>
+  <string name="download_file_success">%s enregistré dans Téléchargements</string>
+  <string name="download_file_error">Erreur lors de l\'écriture du fichier : %s</string>
+  <string name="create_file_error">Impossible de créer le fichier</string>
+  <string name="android_version_not_supported">Non pris en charge sur Android &lt; 10</string>
   <string name="share_data_in_progress">Partage du fichier en cours…</string>
   <string name="no_data_for_date">Aucune donnée disponible pour cette date.</string>
   <string name="empty_list_of_forms_date_filter_title">Aucune donnée disponible</string>

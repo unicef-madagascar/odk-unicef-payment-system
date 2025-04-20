@@ -789,7 +789,10 @@
     <string name="filter_by_date">Filter by date</string>
     <string name="download_data">Download data</string>
     <string name="share_data">Share data</string>
-    <string name="download_data_success">Data saved successfully in the Downloads folder</string>
+    <string name="download_file_success">%s saved in Downloads</string>
+    <string name="download_file_error">Error saving file : %s</string>
+    <string name="create_file_error">Error creating file</string>
+    <string name="android_version_not_supported">Not supported on Android &lt; 10</string>
     <string name="share_data_in_progress">Data sharing in progress…</string>
     <string name="no_data_for_date">No data available for selected date</string>
     <string name="empty_list_of_forms_date_filter_title">No data available</string>
