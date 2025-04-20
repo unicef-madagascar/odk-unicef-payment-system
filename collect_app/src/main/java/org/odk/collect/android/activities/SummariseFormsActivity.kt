@@ -219,16 +219,19 @@ class SummariseFormsActivity : LocalizedActivity() {
 
     private fun buildCsvForSelectedDate(): Pair<String, String>? {
         val date = filterViewModel.selectedDate.value ?: MaterialDatePicker.todayInUtcMilliseconds()
+        val formId = filterViewModel.selectedForm.value
 
         val finalizedForms = instancesRepository.getAllByStatus(
             Instance.STATUS_COMPLETE,
             Instance.STATUS_SUBMITTED,
             Instance.STATUS_SUBMISSION_FAILED
         )
-
         val filteredForms = finalizedForms.filter {
             val finalizationDate = extractDateFieldAsMillis(it.instanceFilePath, "end")
-            finalizationDate != null && isSameDay(finalizationDate, date)
+            val matchesDate = finalizationDate != null && isSameDay(finalizationDate, date)
+            val matchesForm = it.formId == formId
+
+            matchesDate && matchesForm
         }
 
         if (filteredForms.isEmpty()) {
@@ -256,7 +259,8 @@ class SummariseFormsActivity : LocalizedActivity() {
         }
 
         val csv = rows.joinToString("\n")
-        val fileName = "unicef_${SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date(date))}.csv"
+        val firstFormDisplayName = filteredForms.firstOrNull()?.displayName
+        val fileName = "${firstFormDisplayName}__${SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date(date))}.csv"
         return Pair(fileName, csv)
     }
 
@@ -265,10 +269,25 @@ class SummariseFormsActivity : LocalizedActivity() {
         val (fileName, csv) = result
 
         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val file = File(downloadsDir, fileName)
+        val baseName = fileName.substringBeforeLast(".")
+        val extension = fileName.substringAfterLast(".")
+
+        val file = getUniqueFile(downloadsDir, baseName, extension)
         file.writeText(csv)
 
         Toast.makeText(this, getString(org.odk.collect.strings.R.string.download_data_success), Toast.LENGTH_LONG).show()
+    }
+
+    private fun getUniqueFile(directory: File, baseName: String, extension: String): File {
+        var file = File(directory, "$baseName.$extension")
+        var index = 1
+
+        while (file.exists()) {
+            file = File(directory, "$baseName ($index).$extension")
+            index++
+        }
+
+        return file
     }
 
     private fun shareDataForSelectedDate() {
