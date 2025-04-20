@@ -35,9 +35,15 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import android.os.Environment
 import android.content.SharedPreferences
 import org.odk.collect.android.summary.SummariseFormsListFragment
+import android.content.ContentValues
+import android.content.Context
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
+import com.google.android.material.snackbar.Snackbar
+import android.view.View
 
 class SummariseFormsActivity : LocalizedActivity() {
     @Inject
@@ -260,7 +266,10 @@ class SummariseFormsActivity : LocalizedActivity() {
 
         val csv = rows.joinToString("\n")
         val firstFormDisplayName = filteredForms.firstOrNull()?.displayName
-        val fileName = "${firstFormDisplayName}__${SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date(date))}.csv"
+
+        val timestamp = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date())
+        val fileName = "${firstFormDisplayName}__${timestamp}.csv"
+
         return Pair(fileName, csv)
     }
 
@@ -268,26 +277,53 @@ class SummariseFormsActivity : LocalizedActivity() {
         val result = buildCsvForSelectedDate() ?: return
         val (fileName, csv) = result
 
-        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val baseName = fileName.substringBeforeLast(".")
-        val extension = fileName.substringAfterLast(".")
-
-        val file = getUniqueFile(downloadsDir, baseName, extension)
-        file.writeText(csv)
-
-        Toast.makeText(this, getString(org.odk.collect.strings.R.string.download_data_success), Toast.LENGTH_LONG).show()
+        saveCsvToDownloads(this, fileName, csv)
     }
 
-    private fun getUniqueFile(directory: File, baseName: String, extension: String): File {
-        var file = File(directory, "$baseName.$extension")
-        var index = 1
+    private fun saveCsvToDownloads(context: Context, baseFileName: String, csv: String) {
+        val rootView = findViewById<View>(android.R.id.content)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val resolver = context.contentResolver
 
-        while (file.exists()) {
-            file = File(directory, "$baseName ($index).$extension")
-            index++
+            // Add extension if not already added
+            val extension = ".csv"
+            var fileName = baseFileName
+            if (!fileName.endsWith(extension)) {
+                fileName += extension
+            }
+
+            // Only access MediaStore.Downloads safely inside API check
+            val downloadsUri = MediaStore.Downloads.EXTERNAL_CONTENT_URI
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                put(MediaStore.Downloads.MIME_TYPE, "text/csv")
+                put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                put(MediaStore.Downloads.IS_PENDING, 1)
+            }
+
+            val uri = resolver.insert(downloadsUri, contentValues)
+            if (uri != null) {
+                try {
+                    resolver.openOutputStream(uri)?.use { outputStream ->
+                        outputStream.write(csv.toByteArray())
+                        outputStream.flush()
+                    }
+
+                    val finishValues = ContentValues().apply {
+                        put(MediaStore.Downloads.IS_PENDING, 0)
+                    }
+                    resolver.update(uri, finishValues, null, null)
+
+                    Snackbar.make(rootView, context.getString(org.odk.collect.strings.R.string.download_file_success, fileName), Snackbar.LENGTH_LONG).show()
+                } catch (e: Exception) {
+                    Snackbar.make(rootView, context.getString(org.odk.collect.strings.R.string.download_file_error, e.message), Snackbar.LENGTH_LONG).show()
+                }
+            } else {
+                Snackbar.make(rootView, context.getString(org.odk.collect.strings.R.string.create_file_error), Snackbar.LENGTH_LONG).show()
+            }
+        } else {
+            Snackbar.make(rootView, context.getString(org.odk.collect.strings.R.string.android_version_not_supported), Snackbar.LENGTH_LONG).show()
         }
-
-        return file
     }
 
     private fun shareDataForSelectedDate() {
