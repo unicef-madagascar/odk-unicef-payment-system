@@ -10,14 +10,22 @@ import androidx.fragment.app.activityViewModels
 import org.odk.collect.android.R
 import org.odk.collect.android.summary.utils.extractDateFieldAsMillis
 import org.odk.collect.android.summary.utils.isSameDay
+import org.odk.collect.android.summary.utils.displayDate
 import org.odk.collect.forms.instances.Instance
 import org.odk.collect.forms.instances.InstancesRepository
-import org.odk.collect.lists.EmptyListView
 import java.io.File
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import javax.xml.parsers.DocumentBuilderFactory
 import androidx.lifecycle.MediatorLiveData
+import org.odk.collect.android.summary.utils.extractFieldValueFromXml
+
+data class FilterParams(
+    val date:      Long?,
+    val formId:    String?,
+    val fokontany: String?,
+    val commune:   String?
+)
 
 class SummariseFormsDataFragment(
     private val instancesRepository: InstancesRepository
@@ -25,7 +33,7 @@ class SummariseFormsDataFragment(
 
     private val filterViewModel: FilterViewModel by activityViewModels()
 
-    private val combinedFilter = MediatorLiveData<Pair<Long?, String?>>()
+    private val combinedFilter = MediatorLiveData<FilterParams>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,20 +44,26 @@ class SummariseFormsDataFragment(
 
         // Refresh data when filters are set
         combinedFilter.addSource(filterViewModel.selectedDate) { date: Long? ->
-            combinedFilter.value = Pair(date, filterViewModel.selectedForm.value)
+            combinedFilter.value = FilterParams(date, filterViewModel.selectedForm.value, filterViewModel.selectedFokontany.value, filterViewModel.selectedCommune.value)
         }
         combinedFilter.addSource(filterViewModel.selectedForm) { form: String? ->
-            combinedFilter.value = Pair(filterViewModel.selectedDate.value, form)
+            combinedFilter.value = FilterParams(filterViewModel.selectedDate.value, form, filterViewModel.selectedFokontany.value, filterViewModel.selectedCommune.value)
         }
-        combinedFilter.observe(viewLifecycleOwner) { filterPair: Pair<Long?, String?> ->
-            val (date, formId) = filterPair
-            refreshSummaryForDate(view, date ?: 0, formId ?: "")
+        combinedFilter.addSource(filterViewModel.selectedFokontany) { fokontany: String? ->
+            combinedFilter.value = FilterParams(filterViewModel.selectedDate.value, filterViewModel.selectedForm.value, fokontany, filterViewModel.selectedCommune.value)
+        }
+        combinedFilter.addSource(filterViewModel.selectedCommune) { commune: String? ->
+            combinedFilter.value = FilterParams(filterViewModel.selectedDate.value, filterViewModel.selectedForm.value, filterViewModel.selectedFokontany.value, commune)
+        }
+        combinedFilter.observe(viewLifecycleOwner) { filters: FilterParams ->
+            val (date, formId, fokontany, commune) = filters
+            refreshSummaryForFilters(view, date ?: 0, formId ?: "", fokontany, commune)
         }
 
         return view
     }
 
-    private fun refreshSummaryForDate(view: View, date: Long, formId: String) {
+    private fun refreshSummaryForFilters(view: View, date: Long, formId: String, fokontany: String?, commune: String?) {
         val finalizedForms = instancesRepository.getAllByStatus(
             Instance.STATUS_COMPLETE,
             Instance.STATUS_SUBMITTED,
@@ -59,32 +73,57 @@ class SummariseFormsDataFragment(
             val finalizationDate = extractDateFieldAsMillis(it.instanceFilePath, "end")
             val matchesDate = finalizationDate != null && isSameDay(finalizationDate, date)
             val matchesForm = it.formId == formId
+            val fokontanyFormValue = extractFieldValueFromXml(it.instanceFilePath, "fokontany")
+            val matchesFokontany = (fokontany == null) || (fokontanyFormValue == fokontany)
+            val communeFormValue = extractFieldValueFromXml(it.instanceFilePath, "commune")
+            val matchesCommune = (commune == null) || (communeFormValue == commune)
 
-            matchesDate && matchesForm
+            matchesDate && matchesForm && matchesFokontany && matchesCommune
         }
-
-        val emptyListView = view.findViewById<EmptyListView>(R.id.empty)
-        val container = view.findViewById<ViewGroup>(R.id.summary_container)
+        val filterFormValue = view.findViewById<TextView>(R.id.filterFormValue)
+        val filterDateValue = view.findViewById<TextView>(R.id.filterDateValue)
+        val filterFokontanyValue = view.findViewById<TextView>(R.id.filterFokontanyValue)
+        val filterCommuneValue = view.findViewById<TextView>(R.id.filterCommuneValue)
         val totalValue = view.findViewById<TextView>(R.id.totalValue)
         val countPaymentsValue = view.findViewById<TextView>(R.id.countPaymentsValue)
+        val countPaymentsLabel = view.findViewById<TextView>(R.id.countPaymentsLabel)
         val countHouseholdsValue = view.findViewById<TextView>(R.id.countHouseholdsValue)
+        val countHouseholdsLabel = view.findViewById<TextView>(R.id.countHouseholdsLabel)
         val formatter = NumberFormat.getIntegerInstance() as DecimalFormat
 
-        if (filteredForms.isEmpty()) {
-            emptyListView.visibility = View.VISIBLE
-            setTextViewsVisibility(container, View.GONE)
-        } else {
-            emptyListView.visibility = View.GONE
-            setTextViewsVisibility(container, View.VISIBLE)
+        filterFormValue.text = filteredForms.firstOrNull()?.displayName ?: getString(org.odk.collect.strings.R.string.default_label)
+        filterDateValue.text = getString(
+            org.odk.collect.strings.R.string.label_date,
+            displayDate(date)
+        )
+        filterFokontanyValue.text = getString(
+            org.odk.collect.strings.R.string.label_fokontany,
+            fokontany ?: getString(org.odk.collect.strings.R.string.filter_all_fokontany_display)
+        )
+        filterCommuneValue.text = getString(
+            org.odk.collect.strings.R.string.label_commune,
+            commune ?: getString(org.odk.collect.strings.R.string.filter_all_commune_display)
+        )
 
-            countPaymentsValue.text = filteredForms.size.toString()
-            val total = sumFieldAcrossForms(filteredForms, "montant")
-            val formattedTotal = formatter.format(total.toInt())
-            val totalDisplay = context?.getString(org.odk.collect.strings.R.string.amount_ariary, formattedTotal)
-            totalValue.text = totalDisplay
-            val householdsList = getUniqueFieldValues(filteredForms, "hope_household_id")
-            countHouseholdsValue.text = householdsList.size.toString()
-        }
+        val montantTotal = sumFieldAcrossForms(filteredForms, "montant")
+        val montantTotalFormatted = formatter.format(montantTotal.toInt())
+        val totalDisplay = context?.getString(org.odk.collect.strings.R.string.amount_ariary, montantTotalFormatted)
+        totalValue.text = totalDisplay
+
+        val paymentCount = filteredForms.size
+        countPaymentsValue.text = paymentCount.toString()
+        countPaymentsLabel.text = resources.getQuantityString(
+            org.odk.collect.strings.R.plurals.summary_total_payments,
+            paymentCount
+        )
+
+        val householdsList = getUniqueFieldValues(filteredForms, "hope_id_menage")
+        val householdsCount = householdsList.size
+        countHouseholdsValue.text = householdsCount.toString()
+        countHouseholdsLabel.text = resources.getQuantityString(
+            org.odk.collect.strings.R.plurals.summary_total_households,
+            householdsCount
+        )
     }
 
     private fun sumFieldAcrossForms(forms: List<Instance>, fieldName: String): Double {

@@ -6,6 +6,9 @@ import java.io.File
 import java.util.Calendar
 import javax.xml.parsers.DocumentBuilderFactory
 import org.w3c.dom.Node
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.Date
 
 fun extractDateFieldAsMillis(instancePath: String, fieldName: String): Long? {
     return try {
@@ -68,4 +71,9 @@ fun extractAllFields(xmlPath: String): Map<String, String> {
     }
 
     return result
+}
+
+fun displayDate(epochMillis: Long): String {
+    val sdf = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+    return sdf.format(Date(epochMillis))
 }

@@ -13,6 +13,7 @@ import androidx.lifecycle.MediatorLiveData
 import org.odk.collect.android.R
 import org.odk.collect.android.external.InstancesContract
 import org.odk.collect.android.summary.utils.extractDateFieldAsMillis
+import org.odk.collect.android.summary.utils.extractFieldValueFromXml
 import org.odk.collect.android.summary.utils.isSameDay
 import org.odk.collect.forms.instances.Instance
 import org.odk.collect.forms.instances.InstancesRepository
@@ -27,7 +28,7 @@ class SummariseFormsListFragment(
 
     private val filterViewModel: FilterViewModel by activityViewModels()
 
-    private val combinedFilter = MediatorLiveData<Pair<Long?, String?>>()
+    private val combinedFilter = MediatorLiveData<FilterParams>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,18 +41,24 @@ class SummariseFormsListFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         // Refresh data when filters are set
         combinedFilter.addSource(filterViewModel.selectedDate) { date: Long? ->
-            combinedFilter.value = Pair(date, filterViewModel.selectedForm.value)
+            combinedFilter.value = FilterParams(date, filterViewModel.selectedForm.value, filterViewModel.selectedFokontany.value, filterViewModel.selectedCommune.value)
         }
         combinedFilter.addSource(filterViewModel.selectedForm) { form: String? ->
-            combinedFilter.value = Pair(filterViewModel.selectedDate.value, form)
+            combinedFilter.value = FilterParams(filterViewModel.selectedDate.value, form, filterViewModel.selectedFokontany.value, filterViewModel.selectedCommune.value)
         }
-        combinedFilter.observe(viewLifecycleOwner) { filterPair: Pair<Long?, String?> ->
-            val (date, formId) = filterPair
-            refreshFormsForDate(view, date ?: 0, formId ?: "")
+        combinedFilter.addSource(filterViewModel.selectedFokontany) { fokontany: String? ->
+            combinedFilter.value = FilterParams(filterViewModel.selectedDate.value, filterViewModel.selectedForm.value, fokontany, filterViewModel.selectedCommune.value)
+        }
+        combinedFilter.addSource(filterViewModel.selectedCommune) { commune: String? ->
+            combinedFilter.value = FilterParams(filterViewModel.selectedDate.value, filterViewModel.selectedForm.value, filterViewModel.selectedFokontany.value, commune)
+        }
+        combinedFilter.observe(viewLifecycleOwner) { filters: FilterParams ->
+            val (date, formId, fokontany, commune) = filters
+            refreshFormsForFilters(view, date ?: 0, formId ?: "", fokontany, commune)
         }
     }
 
-    private fun refreshFormsForDate(view: View, date: Long, formId: String) {
+    private fun refreshFormsForFilters(view: View, date: Long, formId: String, fokontany: String?, commune: String?) {
         val listView = view.findViewById<ListView>(R.id.form_list)
         val emptyListView = view.findViewById<EmptyListView>(R.id.empty)
 
@@ -64,8 +71,12 @@ class SummariseFormsListFragment(
             val finalizationDate = extractDateFieldAsMillis(it.instanceFilePath, "end")
             val matchesDate = finalizationDate != null && isSameDay(finalizationDate, date)
             val matchesForm = it.formId == formId
+            val fokontanyFormValue = extractFieldValueFromXml(it.instanceFilePath, "fokontany")
+            val matchesFokontany = (fokontany == null) || (fokontanyFormValue == fokontany)
+            val communeFormValue = extractFieldValueFromXml(it.instanceFilePath, "commune")
+            val matchesCommune = (commune == null) || (communeFormValue == commune)
 
-            matchesDate && matchesForm
+            matchesDate && matchesForm && matchesFokontany && matchesCommune
         }
         .sortedByDescending {
             extractDateFieldAsMillis(it.instanceFilePath, "end") ?: 0L

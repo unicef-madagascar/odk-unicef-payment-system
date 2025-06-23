@@ -18,72 +18,94 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Total amount -->
+            <!-- Filter values -->
             <TextView
-                android:id="@+id/totalLabel"
+                android:id="@+id/filterFormValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/summary_total_amount"
-                android:textAppearance="?attr/textAppearanceHeadline6"
-                android:paddingBottom="4dp"/>
+                android:text=""
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:paddingBottom="5dp"/>
 
+            <TextView
+                android:id="@+id/filterDateValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:paddingBottom="5dp"/>
+
+            <TextView
+                android:id="@+id/filterFokontanyValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:paddingBottom="5dp"/>
+
+            <TextView
+                android:id="@+id/filterCommuneValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:paddingBottom="40dp"/>
+
+            <!-- Total amount -->
             <TextView
                 android:id="@+id/totalValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textAppearance="?attr/textAppearanceBody1"
+                android:textAppearance="?attr/textAppearanceHeadlineMedium"
                 android:textColor="?android:textColorPrimary"
-                android:paddingBottom="16dp"/>
-
-            <!-- Total payments -->
-            <TextView
-                android:id="@+id/countPaymentsLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/summary_count_submissions"
-                android:textAppearance="?attr/textAppearanceHeadline6"
                 android:paddingBottom="4dp"/>
 
+            <TextView
+                android:id="@+id/totalLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/summary_total_amount"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:paddingBottom="30dp"/>
+
+            <!-- Total payments -->
             <TextView
                 android:id="@+id/countPaymentsValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textAppearance="?attr/textAppearanceBody1"
+                android:textAppearance="?attr/textAppearanceHeadlineMedium"
                 android:textColor="?android:textColorPrimary"
-                android:paddingBottom="16dp"/>
-
-            <!-- Total households -->
-            <TextView
-                android:id="@+id/countHouseholdsLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/summary_count_households"
-                android:textAppearance="?attr/textAppearanceHeadline6"
                 android:paddingBottom="4dp"/>
 
+            <TextView
+                android:id="@+id/countPaymentsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:paddingBottom="30dp"/>
+
+            <!-- Total households -->
             <TextView
                 android:id="@+id/countHouseholdsValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textAppearance="?attr/textAppearanceBody1"
+                android:textAppearance="?attr/textAppearanceHeadlineMedium"
                 android:textColor="?android:textColorPrimary"
-                android:paddingBottom="16dp"/>
+                android:paddingBottom="4dp"/>
+
+            <TextView
+                android:id="@+id/countHouseholdsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:paddingBottom="30dp"/>
 
         </LinearLayout>
     </ScrollView>
-
-    <!-- No data view -->
-    <org.odk.collect.lists.EmptyListView
-        android:id="@+id/empty"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:icon="@drawable/ic_baseline_inbox_72"
-        app:title="@string/empty_list_of_forms_date_filter_title"
-        app:subtitle="@string/empty_list_of_forms_date_filter_subtitle"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

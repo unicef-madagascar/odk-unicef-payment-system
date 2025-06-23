@@ -15,6 +15,12 @@
         app:showAsAction="always"/>
 
     <item
+        android:id="@+id/action_filter_fokontany"
+        android:icon="@drawable/ic_map"
+        android:title="@string/filter_by_fokontany"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/action_download_data"
         android:icon="@drawable/ic_download_24"
         android:title="@string/download_data"

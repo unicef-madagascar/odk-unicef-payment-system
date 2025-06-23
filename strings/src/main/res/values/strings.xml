@@ -781,12 +781,27 @@
     # SUMMARISE FORMS
     ##############################################
     -->
-    <string name="data_summary">Data summary</string>
-    <string name="summary_total_amount">Total amount</string>
-    <string name="summary_count_submissions">Total submissions</string>
-    <string name="summary_count_households">Total households</string>
+    <string name="data_summary">Payments summary</string>
+    <string name="data_list">Payments list</string>
+    <string name="default_label">-</string>
+    <string name="summary_total_amount">total amount paid</string>
+    <plurals name="summary_total_payments">
+        <item quantity="one">payment made</item>
+        <item quantity="other">payments made</item>
+    </plurals>
+    <plurals name="summary_total_households">
+        <item quantity="one">household paid</item>
+        <item quantity="other">households paid</item>
+    </plurals>
     <string name="filter_by_form">Filter by form</string>
     <string name="filter_by_date">Filter by date</string>
+    <string name="label_date">Date : %s</string>
+    <string name="filter_by_fokontany">Filter by fokontany</string>
+    <string name="filter_all_fokontany_option">-- All --</string>
+    <string name="filter_all_fokontany_display">All</string>
+    <string name="label_fokontany">Fokontany : %s</string>
+    <string name="filter_all_commune_display">All</string>
+    <string name="label_commune">Commune : %s</string>
     <string name="download_data">Download data</string>
     <string name="share_data">Share data</string>
     <string name="download_file_success">%s saved in Downloads</string>

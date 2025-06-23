@@ -22,6 +22,7 @@ import org.odk.collect.forms.instances.InstancesRepository
 import org.odk.collect.strings.localization.LocalizedActivity
 import org.odk.collect.forms.instances.Instance
 import org.odk.collect.android.summary.utils.extractDateFieldAsMillis
+import org.odk.collect.android.summary.utils.extractFieldValueFromXml
 import org.odk.collect.android.summary.utils.isSameDay
 import org.odk.collect.android.summary.utils.extractAllFields
 import androidx.activity.viewModels
@@ -44,6 +45,8 @@ import android.os.Environment
 import android.provider.MediaStore
 import com.google.android.material.snackbar.Snackbar
 import android.view.View
+
+private const val DELIM = ", "
 
 class SummariseFormsActivity : LocalizedActivity() {
     @Inject
@@ -154,7 +157,7 @@ class SummariseFormsActivity : LocalizedActivity() {
             tab.text = if (position == 0) {
                 getString(org.odk.collect.strings.R.string.data_summary)
             } else {
-                getString(org.odk.collect.strings.R.string.data)
+                getString(org.odk.collect.strings.R.string.data_list)
             }
         }.attach()
     }
@@ -175,6 +178,10 @@ class SummariseFormsActivity : LocalizedActivity() {
                     }
                     R.id.action_filter_date -> {
                         showDatePicker()
+                        true
+                    }
+                    R.id.action_filter_fokontany -> {
+                        showFokontanySelectDialog()
                         true
                     }
                     R.id.action_download_data -> {
@@ -217,10 +224,91 @@ class SummariseFormsActivity : LocalizedActivity() {
 
         picker.addOnPositiveButtonClickListener { selection ->
             filterViewModel.setDate(selection)
-            preferences.edit().putLong("selected_date", selection).apply()
+            filterViewModel.setFokontany(null)
+            filterViewModel.setCommune(null)
+            preferences.edit()
+                .putLong("selected_date", selection)
+                .remove("selected_fokontany")
+                .remove("selected_commune")
+                .apply()
         }
 
         picker.show(supportFragmentManager, "DATE_PICKER")
+    }
+
+    private fun showFokontanySelectDialog() {
+        val fokontanyList = buildFokontanyItems()
+        val fokontanyArray = fokontanyList.toTypedArray()
+        val selectedIndex = findCurrentIndex(fokontanyList)
+
+        MaterialAlertDialogBuilder(this@SummariseFormsActivity)
+            .setTitle(getString(org.odk.collect.strings.R.string.filter_by_fokontany))
+            .setSingleChoiceItems(fokontanyArray, selectedIndex) { dialog, which ->
+                handleFokontanySelection(fokontanyArray[which])
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun buildFokontanyItems(): List<String> {
+        val date = filterViewModel.selectedDate.value ?: MaterialDatePicker.todayInUtcMilliseconds()
+        val formId = filterViewModel.selectedForm.value
+        val allLabel = getString(org.odk.collect.strings.R.string.filter_all_fokontany_option)
+
+        val fokontanyValues = instancesRepository.getAllByStatus(
+            Instance.STATUS_COMPLETE,
+            Instance.STATUS_SUBMITTED,
+            Instance.STATUS_SUBMISSION_FAILED
+        ).filter {
+            val finalizationDate = extractDateFieldAsMillis(it.instanceFilePath, "end")
+            val matchesDate = finalizationDate != null && isSameDay(finalizationDate, date)
+            val matchesForm = it.formId == formId
+            matchesDate && matchesForm
+        }.mapNotNull {
+            val fokontany = extractFieldValueFromXml(it.instanceFilePath, "fokontany")
+            val commune = extractFieldValueFromXml(it.instanceFilePath, "commune")
+            if (fokontany != null && commune != null) {
+                "$fokontany, $commune"
+            } else {
+                fokontany
+            }
+        }.distinct().sorted()
+
+        return listOf(allLabel) + fokontanyValues
+    }
+
+    private fun findCurrentIndex(fokontanyList: List<String>): Int {
+        val allLabel = getString(org.odk.collect.strings.R.string.filter_all_fokontany_option)
+        val currentFokontany = filterViewModel.selectedFokontany.value
+        val currentCommune = filterViewModel.selectedCommune.value
+        val currentDisplay = when {
+            currentFokontany == null -> allLabel
+            currentCommune.isNullOrEmpty() -> currentFokontany
+            else -> "$currentFokontany$DELIM$currentCommune"
+        }
+        return fokontanyList.indexOf(currentDisplay).takeIf { it >= 0 } ?: 0
+    }
+
+    private fun handleFokontanySelection(selectedDisplay: String) {
+        val allLabel = getString(org.odk.collect.strings.R.string.filter_all_fokontany_option)
+        if (selectedDisplay == allLabel) {
+            filterViewModel.setFokontany(null)
+            filterViewModel.setCommune(null)
+            preferences.edit()
+                .remove("selected_fokontany")
+                .remove("selected_commune")
+                .apply()
+        } else {
+            val parts = selectedDisplay.split(DELIM, limit = 2)
+            val fokontany = parts[0]
+            val commune = parts.getOrNull(1)
+            filterViewModel.setFokontany(fokontany)
+            filterViewModel.setCommune(commune)
+            preferences.edit()
+                .putString("selected_fokontany", fokontany)
+                .putString("selected_commune", commune)
+                .apply()
+        }
     }
 
     private fun buildCsvForSelectedDate(): Pair<String, String>? {

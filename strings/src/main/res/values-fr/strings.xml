@@ -629,12 +629,27 @@
   # SUMMARISE FORMS
   ##############################################
   -->
-  <string name="data_summary">Résumé des données</string>
-  <string name="summary_total_amount">Montant total</string>
-  <string name="summary_count_submissions">Nombre total de soumissions</string>
-  <string name="summary_count_households">Nombre total de ménages</string>
+  <string name="data_summary">Résumé des paiements</string>
+  <string name="data_list">Liste des paiements</string>
+  <string name="default_label">-</string>
+  <string name="summary_total_amount">montant total payé</string>
+  <plurals name="summary_total_payments">
+    <item quantity="one">paiement effecté</item>
+    <item quantity="other">paiements effectués</item>
+  </plurals>
+  <plurals name="summary_total_households">
+    <item quantity="one">ménage payé</item>
+    <item quantity="other">ménages payés</item>
+  </plurals>
   <string name="filter_by_form">Filtrer par formulaire</string>
   <string name="filter_by_date">Filtrer par date</string>
+  <string name="label_date">Date : %s</string>
+  <string name="filter_by_fokontany">Filtrer par fokontany</string>
+  <string name="filter_all_fokontany_option">-- Tous --</string>
+  <string name="filter_all_fokontany_display">Tous</string>
+  <string name="label_fokontany">Fokontany : %s</string>
+  <string name="filter_all_commune_display">Tous</string>
+  <string name="label_commune">Commune : %s</string>
   <string name="download_data">Exporter les données</string>
   <string name="share_data">Partager les données</string>
   <string name="download_file_success">%s enregistré dans Téléchargements</string>

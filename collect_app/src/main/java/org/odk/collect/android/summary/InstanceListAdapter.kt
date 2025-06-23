@@ -50,7 +50,7 @@ class InstanceListAdapter(
         subtitleView.text = endDateLocal?.let { dateFormat.format(Date(it)) } ?: ""
 
         // Set subtitle2: HOPE ID and total
-        val hopeId = extractFieldValueFromXml(instance.instanceFilePath, "hope_household_id")
+        val hopeId = extractFieldValueFromXml(instance.instanceFilePath, "hope_id_menage")
         val total = extractFieldValueFromXml(instance.instanceFilePath, "montant")
         val totalInt = total?.toDoubleOrNull()?.toInt() ?: 0
         val formattedTotal = formatter.format(totalInt)
